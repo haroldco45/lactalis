@@ -14,6 +14,20 @@
         .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         h1 { text-align: center; color: var(--lactalis-green); font-size: 1.4rem; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 15px; }
+        
+        /* Estilos Suscripción */
+        #bloqueo-suscripcion {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            z-index: 9999;
+            text-align: center;
+            padding-top: 20%;
+        }
+        .btn-pago { background: #f1c40f; color: black; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 20px; cursor: pointer; border: none; }
+        
         .input-group { margin-bottom: 10px; }
         input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 0.9rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
@@ -30,6 +44,13 @@
     </style>
 </head>
 <body>
+
+<div id="bloqueo-suscripcion">
+    <h2>⚠️ SUSCRIPCIÓN VENCIDA</h2>
+    <p>Tu acceso al Portafolio Lactalis ha caducado.</p>
+    <p>Para reactivar, realiza el pago mensual de <b>$20.000 COP</b>.</p>
+    <button class="btn-pago" onclick="solicitarActivacion()">💰 PAGAR MI SUSCRIPCIÓN</button>
+</div>
 
 <div class="container">
     <h1>Portafolio Lactalis</h1>
@@ -66,6 +87,31 @@
 </div>
 
 <script>
+    // --- Lógica de Suscripción ---
+    const MES_EN_MS = 30 * 24 * 60 * 60 * 1000; // 30 días en milisegundos
+
+    function verificarSuscripcion() {
+        let fechaPago = localStorage.getItem('fechaUltimoPago');
+        
+        // Si es la primera vez, le regalamos 24h para probar
+        if (!fechaPago) {
+            fechaPago = Date.now();
+            localStorage.setItem('fechaUltimoPago', fechaPago);
+        }
+
+        const tiempoTranscurrido = Date.now() - parseInt(fechaPago);
+        
+        if (tiempoTranscurrido > MES_EN_MS) {
+            document.getElementById('bloqueo-suscripcion').style.display = 'block';
+        }
+    }
+
+    function solicitarActivacion() {
+        const msg = encodeURIComponent("Hola Harold, quiero pagar los $20.000 de mi mensualidad de la App Lactalis para activarla.");
+        window.open(`https://wa.me/573117700431?text=${msg}`, '_blank');
+    }
+
+    // --- Datos de Productos ---
     const productosBase = [
         { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", unidad: "UND", precio: 0 },
         { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M 827135", unidad: "UND", precio: 0 },
@@ -104,7 +150,7 @@
             if (!estadoApp[p.ref]) estadoApp[p.ref] = { cant: 0, unidad: p.unidad, precio: p.precio, desc: 0 };
             const it = estadoApp[p.ref];
             const neto = it.precio * (1 - (it.desc / 100));
-            body.innerHTML += `<tr>
+            body.innerHTML += `<tr id="fila-${p.ref}">
                 <td><strong>${p.nombre}</strong><br><small>${p.ref}</small></td>
                 <td><input type="text" class="edit-input unit-input" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.cant || ''}" oninput="cambiar('${p.ref}','cant',this.value)"></td>
@@ -162,7 +208,10 @@
         window.open(`https://wa.me/573117700431?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    window.onload = renderizar;
+    window.onload = () => {
+        verificarSuscripcion(); // Al cargar, revisa si ya pasó el mes
+        renderizar();
+    };
     document.getElementById('buscador').oninput = (e) => renderizar(e.target.value);
 </script>
 </body>
