@@ -10,7 +10,7 @@
             --parmalat-blue: #0056b3;
             --bg-color: #f8f9fa;
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 160px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 170px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         h1 { text-align: center; color: var(--lactalis-green); font-size: 1.4rem; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 15px; }
@@ -21,8 +21,11 @@
         td { padding: 6px; border-bottom: 1px solid #eee; }
         .edit-input { width: 75px; padding: 6px; border: 1px solid #4CAF50; border-radius: 5px; text-align: center; font-size: 0.85rem; }
         .unit-input { width: 55px; border-color: #ccc; }
-        .total-bar { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; z-index: 999; }
-        .btn-whatsapp { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #25d366; color: white; padding: 15px; border-radius: 50px; text-decoration: none; font-weight: bold; width: 90%; max-width: 350px; text-align: center; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .total-bar { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; z-index: 999; }
+        .button-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; display: flex; gap: 10px; z-index: 1000; }
+        .btn { flex: 1; padding: 15px; border-radius: 50px; text-decoration: none; font-weight: bold; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: none; cursor: pointer; color: white; font-size: 0.9rem; }
+        .btn-whatsapp { background-color: #25d366; }
+        .btn-clear { background-color: #e74c3c; }
         .neto-col { font-weight: bold; color: var(--parmalat-blue); }
     </style>
 </head>
@@ -57,9 +60,10 @@
 
 <div class="total-bar">TOTAL NEGOCIO: $<span id="total-general">0</span></div>
 
-<a href="javascript:void(0)" class="btn-whatsapp" onclick="enviarPedido()">
-    🚀 ENVIAR NEGOCIO POR WHATSAPP
-</a>
+<div class="button-container">
+    <button class="btn btn-clear" onclick="nuevoCliente()">🗑️ NUEVO CLIENTE</button>
+    <button class="btn btn-whatsapp" onclick="enviarPedido()">🚀 ENVIAR WHATSAPP</button>
+</div>
 
 <script>
     const productosBase = [
@@ -89,7 +93,7 @@
         { ref: "9529", nombre: "LECHE PROLE AZUCARADA 60*104GR 827183", unidad: "UND", precio: 0 }
     ];
 
-    const estadoApp = {};
+    let estadoApp = {};
 
     function renderizar(filtro = "") {
         const body = document.getElementById('tabla-body');
@@ -100,7 +104,7 @@
             if (!estadoApp[p.ref]) estadoApp[p.ref] = { cant: 0, unidad: p.unidad, precio: p.precio, desc: 0 };
             const it = estadoApp[p.ref];
             const neto = it.precio * (1 - (it.desc / 100));
-            body.innerHTML += `<tr id="fila-${p.ref}">
+            body.innerHTML += `<tr>
                 <td><strong>${p.nombre}</strong><br><small>${p.ref}</small></td>
                 <td><input type="text" class="edit-input unit-input" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.cant || ''}" oninput="cambiar('${p.ref}','cant',this.value)"></td>
@@ -112,14 +116,11 @@
     }
 
     function cambiar(ref, campo, valor) {
-        // Guardamos el dato sin re-dibujar toda la tabla
         estadoApp[ref][campo] = campo === 'unidad' ? valor : (parseFloat(valor) || 0);
-        
-        // Actualizamos solo el neto de esta fila y el total general
         const it = estadoApp[ref];
         const neto = it.precio * (1 - (it.desc / 100));
-        document.getElementById(`neto-${ref}`).innerText = `$${Math.round(neto).toLocaleString()}`;
-        
+        const netoElem = document.getElementById(`neto-${ref}`);
+        if(netoElem) netoElem.innerText = `$${Math.round(neto).toLocaleString()}`;
         calcularTotal();
     }
 
@@ -130,6 +131,16 @@
             t += it.cant * (it.precio * (1 - (it.desc / 100)));
         }
         document.getElementById('total-general').innerText = Math.round(t).toLocaleString();
+    }
+
+    function nuevoCliente() {
+        if(confirm("¿Deseas borrar todo para un nuevo cliente?")) {
+            estadoApp = {};
+            document.getElementById('cliente').value = "";
+            document.getElementById('buscador').value = "";
+            renderizar();
+            calcularTotal();
+        }
     }
 
     function enviarPedido() {
