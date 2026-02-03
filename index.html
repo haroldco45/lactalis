@@ -10,8 +10,9 @@
             --parmalat-blue: #0056b3;
             --bg-color: #f8f9fa;
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 170px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 220px; }
         
+        /* --- ESTILOS CABECERA Y BLOQUEO --- */
         .header-info {
             display: flex;
             justify-content: space-between;
@@ -40,17 +41,23 @@
         h1 { text-align: center; color: var(--lactalis-green); font-size: 1.4rem; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 15px; }
         
+        /* --- INPUTS Y TABLA --- */
         .input-group { margin-bottom: 10px; }
         input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 0.9rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
         th { background-color: var(--lactalis-green); color: white; padding: 8px; text-align: left; position: sticky; top: 0; }
         td { padding: 6px; border-bottom: 1px solid #eee; }
-        .edit-input { width: 75px; padding: 6px; border: 1px solid #4CAF50; border-radius: 5px; text-align: center; font-size: 0.85rem; }
-        .total-bar { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; z-index: 998; }
-        .button-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; display: flex; gap: 10px; z-index: 1000; }
-        .btn { flex: 1; padding: 15px; border-radius: 50px; font-weight: bold; text-align: center; border: none; cursor: pointer; color: white; font-size: 0.9rem; }
+        .edit-input { width: 70px; padding: 6px; border: 1px solid #4CAF50; border-radius: 5px; text-align: center; font-size: 0.85rem; }
+        
+        /* --- BARRAS INFERIORES --- */
+        .total-bar { position: fixed; bottom: 150px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; z-index: 998; }
+        .button-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 500px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; }
+        .row-buttons { display: flex; gap: 8px; width: 100%; }
+        
+        .btn { flex: 1; padding: 12px; border-radius: 50px; font-weight: bold; text-align: center; border: none; cursor: pointer; color: white; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-whatsapp { background-color: #25d366; }
         .btn-clear { background-color: #e74c3c; }
+        .btn-excel { background-color: #1D6F42; } /* Verde Excel */
         .btn-pago { background: #f1c40f; color: black; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 20px; border: none; }
     </style>
 </head>
@@ -72,10 +79,10 @@
     <p class="subtitle">Preventa y Distribución - Distrileco</p>
     
     <div class="input-group">
-        <input type="text" id="cliente" placeholder="Nombre del negocio...">
+        <input type="text" id="cliente" placeholder="Nombre del negocio / Cliente...">
     </div>
     <div class="input-group">
-        <input type="text" id="buscador" placeholder="🔎 Buscar producto...">
+        <input type="text" id="buscador" placeholder="🔎 Buscar por nombre o referencia...">
     </div>
 
     <table>
@@ -84,7 +91,7 @@
                 <th>Producto</th>
                 <th>Und.</th>
                 <th>Cant.</th>
-                <th>P. Base</th>
+                <th>Precio</th>
                 <th>% Desc</th>
                 <th>Neto</th>
             </tr>
@@ -96,12 +103,15 @@
 <div class="total-bar">TOTAL NEGOCIO: $<span id="total-general">0</span></div>
 
 <div class="button-container">
-    <button class="btn btn-clear" onclick="nuevoCliente()">🗑️ NUEVO</button>
-    <button class="btn btn-whatsapp" onclick="enviarPedido()">🚀 WHATSAPP</button>
+    <button class="btn btn-excel" onclick="copiarParaExcel()">📊 COPIAR PARA EXCEL</button>
+    <div class="row-buttons">
+        <button class="btn btn-clear" onclick="nuevoCliente()">🗑️ NUEVO</button>
+        <button class="btn btn-whatsapp" onclick="enviarPedido()">🚀 WHATSAPP</button>
+    </div>
 </div>
 
 <script>
-    // --- RELOJ TIEMPO REAL COLOMBIA ---
+    // --- RELOJ COLOMBIA ---
     function actualizarReloj() {
         const ahora = new Date();
         const opciones = { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
@@ -109,7 +119,7 @@
     }
     setInterval(actualizarReloj, 1000);
 
-    // --- SUSCRIPCIÓN ---
+    // --- SUSCRIPCIÓN (30 DÍAS) ---
     const MES_EN_MS = 30 * 24 * 60 * 60 * 1000;
     function verificarSuscripcion() {
         let inicio = localStorage.getItem('fechaSuscripcion');
@@ -121,39 +131,24 @@
     }
 
     function solicitarActivacion() {
-        window.open(`https://wa.me/573117700431?text=Harold%20quiero%20activar%20mi%20suscripcion`, '_blank');
+        window.open(`https://wa.me/573117700431?text=Harold%20quiero%20activar%20mi%20suscripcion%20de%2020mil`, '_blank');
     }
 
-    // --- BASE DE DATOS COMPLETA REESTABLECIDA ---
+    // --- BASE DE DATOS ---
     const productosBase = [
         { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", unidad: "UND", precio: 0 },
         { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M 827135", unidad: "UND", precio: 0 },
-        { ref: "0936", nombre: "AREQUIPE PROLECHE 12DIP*24UND*50G 827196", unidad: "DISP", precio: 0 },
+        { ref: "0936", nombre: "AREQUIPE PROLECHE 12DIP*24UND*50G", unidad: "DISP", precio: 0 },
         { ref: "10245", nombre: "AREQUIPE PROLECHE 48*150GR 827236", unidad: "UND", precio: 0 },
         { ref: "10689", nombre: "CREMA DE LECHE REPOS 12*1 LT 827140", unidad: "UND", precio: 0 },
-        { ref: "10798", nombre: "LECHE CONDESA PARMA 48*100GR DPK 10220", unidad: "UND", precio: 0 },
         { ref: "11054", nombre: "LECHE PROLE DESLACTOSADA 30*380G 7908", unidad: "UND", precio: 98000 },
         { ref: "11369", nombre: "LECHE PROLE POLVO 30*380GR 827186", unidad: "UND", precio: 0 },
-        { ref: "11370", nombre: "LECHE PROLE POLVO 60*200GR 827174", unidad: "UND", precio: 0 },
         { ref: "11830", nombre: "LECHE PROLE LIQ 18*900ML 10327", unidad: "UND", precio: 0 },
-        { ref: "12011", nombre: "LECHE PROLE POLVO 60*200 BONIF", unidad: "UND", precio: 0 },
         { ref: "13039", nombre: "AREQUIPE PROLECHE 24*6*50GR 827195", unidad: "DISP", precio: 0 },
-        { ref: "13168", nombre: "LECHE PROLE POLVO 12*900GR 827175", unidad: "UND", precio: 0 },
         { ref: "13340", nombre: "CREMA DE LECHE REP LIQ 15BOL*1.1 LT 7862", unidad: "BOLSA", precio: 0 },
-        { ref: "14732", nombre: "AREQUIPE PROLECHE 36*220GR 827394", unidad: "UND", precio: 0 },
-        { ref: "18631", nombre: "LECHE PROLE LIQ 18*1000ML 827817-827967", unidad: "UND", precio: 0 },
-        { ref: "19484", nombre: "SANDUCHERA DE WAFLER OSTER 750W", unidad: "UND", precio: 0 },
-        { ref: "19550", nombre: "LECHE PROLE LIQ DESLACT 18*1000ML 827915", unidad: "UND", precio: 0 },
-        { ref: "19888", nombre: "LECHE PROLE LIQ CLASICA 30*400ML 010328", unidad: "UND", precio: 0 },
-        { ref: "19919", nombre: "LECHE PROLE POLVO 12*8*75GR 827057", unidad: "RISTRA", precio: 0 },
-        { ref: "19920", nombre: "LECHE PROLE POLVO 18*10*25GR 827087", unidad: "RISTRA", precio: 0 },
-        { ref: "19943", nombre: "LECHE COND PARMA 3*4500GR DPK 827037", unidad: "UND", precio: 0 },
-        { ref: "19966", nombre: "LECHE PROLE LIQ CLASICA 30*400ML BONIF", unidad: "UND", precio: 0 },
-        { ref: "20018", nombre: "ACEITE MI CALDERITO 12*900ML BONIF", unidad: "UND", precio: 0 },
-        { ref: "20067", nombre: "LECHE PROLE POLVO 18*10*25GR BONIF", unidad: "RISTRA", precio: 0 },
+        { ref: "18631", nombre: "LECHE PROLE LIQ 18*1000ML 827817", unidad: "UND", precio: 0 },
         { ref: "4634", nombre: "AREQUIPE PROLECHE 24*500GR 27198", unidad: "UND", precio: 0 },
-        { ref: "4641", nombre: "CREMA DE LECHE REPOSTER 27*200ML 827141", unidad: "UND", precio: 0 },
-        { ref: "9529", nombre: "LECHE PROLE AZUCARADA 60*104GR 827183", unidad: "UND", precio: 0 }
+        { ref: "4641", nombre: "CREMA DE LECHE REPOSTER 27*200ML", unidad: "UND", precio: 0 }
     ];
 
     let estadoApp = {};
@@ -166,8 +161,8 @@
             const it = estadoApp[p.ref];
             const neto = it.precio * (1 - (it.desc / 100));
             body.innerHTML += `<tr>
-                <td><strong>${p.nombre}</strong><br><small>${p.ref}</small></td>
-                <td><input type="text" class="edit-input" style="width:50px" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
+                <td><strong>${p.nombre}</strong></td>
+                <td><input type="text" class="edit-input" style="width:40px" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.cant || ''}" oninput="cambiar('${p.ref}','cant',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.precio || ''}" oninput="cambiar('${p.ref}','precio',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.desc || ''}" oninput="cambiar('${p.ref}','desc',this.value)"></td>
@@ -193,8 +188,29 @@
         document.getElementById('total-general').innerText = Math.round(t).toLocaleString();
     }
 
+    function copiarParaExcel() {
+        let texto = "Producto\tReferencia\tUnidad\tCantidad\tPrecio\tDescuento\tSubtotal\n";
+        let hayDatos = false;
+        for (const ref in estadoApp) {
+            const it = estadoApp[ref];
+            if (it.cant > 0) {
+                hayDatos = true;
+                const p = productosBase.find(x => x.ref === ref);
+                const neto = it.precio * (1 - (it.desc / 100));
+                texto += `${p.nombre}\t${ref}\t${it.unidad}\t${it.cant}\t${it.precio}\t${it.desc}\t${Math.round(it.cant * neto)}\n`;
+            }
+        }
+        if (!hayDatos) return alert("No hay productos marcados.");
+        navigator.clipboard.writeText(texto).then(() => alert("✅ Copiado. Pégalo en Excel con Ctrl+V"));
+    }
+
     function nuevoCliente() {
-        if(confirm("¿Limpiar para nuevo cliente?")) { estadoApp = {}; document.getElementById('cliente').value = ""; renderizar(); calcularTotal(); }
+        if(confirm("¿Limpiar todo para nuevo cliente?")) { 
+            estadoApp = {}; 
+            document.getElementById('cliente').value = ""; 
+            renderizar(); 
+            calcularTotal(); 
+        }
     }
 
     function enviarPedido() {
@@ -205,10 +221,11 @@
             const it = estadoApp[r];
             if (it.cant > 0) {
                 const p = productosBase.find(x => x.ref === r);
-                det.push(`✅ *${p.nombre}*\nCant: ${it.cant} ${it.unidad} | Subtotal: $${Math.round(it.cant * (it.precio * (1 - (it.desc / 100)))).toLocaleString()}`);
+                det.push(`✅ *${p.nombre}*\nCant: ${it.cant} ${it.unidad} | Sub: $${Math.round(it.cant * (it.precio * (1 - (it.desc / 100)))).toLocaleString()}`);
             }
         }
-        const msg = `*NEGOCIO DISTRILECO*\n👤 *Cliente:* ${cliente}\n📅 *Fecha/Hora:* ${fechaMsg}\n\n${det.join('\n\n')}`;
+        if (det.length === 0) return alert("Pedido vacío");
+        const msg = `*NEGOCIO DISTRILECO*\n👤 *Cliente:* ${cliente}\n📅 *Fecha:* ${fechaMsg}\n\n${det.join('\n\n')}`;
         window.open(`https://wa.me/573117700431?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
