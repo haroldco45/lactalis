@@ -11,59 +11,19 @@
             --proleche-orange: #f39c12;
             --bg-color: #f8f9fa;
         }
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 10px;
-            padding-bottom: 110px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        h1 { text-align: center; color: var(--lactalis-green); font-size: 1.6rem; margin-bottom: 5px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 140px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { text-align: center; color: var(--lactalis-green); margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 20px; }
         .input-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 600; margin-bottom: 5px; color: #444; }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background-color: var(--lactalis-green); color: white; padding: 12px; text-align: left; font-size: 0.8rem; }
-        td { padding: 12px; border-bottom: 1px solid #f1f1f1; font-size: 0.9rem; }
-        .cant-input { width: 65px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; font-size: 1rem; }
-        .badge { padding: 4px 8px; border-radius: 5px; color: white; font-size: 10px; font-weight: bold; }
-        .badge-parmalat { background-color: var(--parmalat-blue); }
-        .badge-proleche { background-color: var(--proleche-orange); }
-        .btn-whatsapp {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #25d366;
-            color: white;
-            padding: 18px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 85%;
-            max-width: 350px;
-            z-index: 1000;
-        }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        th { background-color: var(--lactalis-green); color: white; padding: 10px; text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
+        .cant-input, .desc-input { width: 60px; text-align: center; padding: 5px !important; }
+        .total-pedido-bar { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 10px; width: 80%; max-width: 400px; text-align: center; font-weight: bold; z-index: 999; }
+        .btn-whatsapp { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #25d366; color: white; padding: 15px; border-radius: 50px; text-decoration: none; font-weight: bold; width: 85%; max-width: 350px; text-align: center; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .precio-final { font-weight: bold; color: var(--parmalat-blue); }
     </style>
 </head>
 <body>
@@ -73,13 +33,10 @@
     <p class="subtitle">Preventa y Distribución - Distrileco</p>
     
     <div class="input-group">
-        <label for="cliente">Nombre del Cliente:</label>
-        <input type="text" id="cliente" placeholder="Ej: Tienda de Don Pepe">
+        <input type="text" id="cliente" placeholder="Nombre del Cliente...">
     </div>
-
     <div class="input-group">
-        <label for="buscador">Buscar Producto:</label>
-        <input type="text" id="buscador" placeholder="Escribe nombre o referencia...">
+        <input type="text" id="buscador" placeholder="🔎 Buscar producto...">
     </div>
 
     <table>
@@ -87,100 +44,93 @@
             <tr>
                 <th>Producto</th>
                 <th>Cant.</th>
-                <th>Marca</th>
+                <th>P. Base</th>
+                <th>Desc %</th>
+                <th>Neto</th>
             </tr>
         </thead>
         <tbody id="tabla-body"></tbody>
     </table>
 </div>
 
+<div class="total-pedido-bar">Total Pedido: $<span id="total-general">0</span></div>
+
 <a href="javascript:void(0)" class="btn-whatsapp" onclick="enviarPedido()">
     ENVIAR PEDIDO POR WHATSAPP
 </a>
 
 <script>
-    // PRODUCTOS INTEGRADOS DIRECTAMENTE
+    // Precios base de ejemplo (ajústalos según tu lista real)
     const productosLactalis = [
-        { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", proveedor: "PARMALAT" },
-        { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M 827135", proveedor: "PARMALAT" },
-        { ref: "0936", nombre: "AREQUIPE PROLECHE 12DIP*24UND*50G 827196", proveedor: "PROLECHE" },
-        { ref: "10245", nombre: "AREQUIPE PROLECHE 48*150GR 827236", proveedor: "PROLECHE" },
-        { ref: "10689", nombre: "CREMA DE LECHE REPOS 12*1 LT 827140", proveedor: "PARMALAT" },
-        { ref: "10798", nombre: "LECHE CONDESA PARMA 48*100GR DPK 10220", proveedor: "PARMALAT" },
-        { ref: "11054", nombre: "LECHE PROLE DESLACTOSADA 30*380G 7908", proveedor: "PROLECHE" },
-        { ref: "11369", nombre: "LECHE PROLE POLVO 30*380GR 827186", proveedor: "PROLECHE" },
-        { ref: "11370", nombre: "LECHE PROLE POLVO 60*200GR 827174", proveedor: "PROLECHE" },
-        { ref: "11830", nombre: "LECHE PROLE LIQ 18*900ML 10327", proveedor: "PROLECHE" },
-        { ref: "12011", nombre: "LECHE PROLE POLVO 60*200 BONIF", proveedor: "PROLECHE" },
-        { ref: "13039", nombre: "AREQUIPE PROLECHE 24*6*50GR 827195", proveedor: "PROLECHE" },
-        { ref: "13168", nombre: "LECHE PROLE POLVO 12*900GR 827175", proveedor: "PROLECHE" },
-        { ref: "13340", nombre: "CREMA DE LECHE REP LIQ 15BOL*1.1 LT 7862", proveedor: "PARMALAT" },
-        { ref: "14732", nombre: "AREQUIPE PROLECHE 36*220GR 827394", proveedor: "PROLECHE" },
-        { ref: "18631", nombre: "LECHE PROLE LIQ 18*1000ML 827817-827967", proveedor: "PROLECHE" },
-        { ref: "19484", nombre: "SANDUCHERA DE WAFLER OSTER 750W", proveedor: "PROLECHE" },
-        { ref: "19550", nombre: "LECHE PROLE LIQ DESLACT 18*1000ML 827915", proveedor: "PROLECHE" },
-        { ref: "19888", nombre: "LECHE PROLE LIQ CLASICA 30*400ML 010328", proveedor: "PROLECHE" },
-        { ref: "19919", nombre: "LECHE PROLE POLVO 12*8*75GR 827057", proveedor: "PROLECHE" },
-        { ref: "19920", nombre: "LECHE PROLE POLVO 18*10*25GR 827087", proveedor: "PROLECHE" },
-        { ref: "19943", nombre: "LECHE COND PARMA 3*4500GR DPK 827037", proveedor: "PARMALAT" },
-        { ref: "19966", nombre: "LECHE PROLE LIQ CLASICA 30*400ML BONIF", proveedor: "PROLECHE" },
-        { ref: "20018", nombre: "ACEITE MI CALDERITO 12*900ML BONIF", proveedor: "PROLECHE" },
-        { ref: "20067", nombre: "LECHE PROLE POLVO 18*10*25GR BONIF", proveedor: "PROLECHE" },
-        { ref: "4634", nombre: "AREQUIPE PROLECHE 24*500GR 27198", proveedor: "PROLECHE" },
-        { ref: "4641", nombre: "CREMA DE LECHE REPOSTER 27*200ML 827141", proveedor: "PARMALAT" },
-        { ref: "9529", nombre: "LECHE PROLE AZUCARADA 60*104GR 827183", proveedor: "PROLECHE" }
+        { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G", precio: 45000 },
+        { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M", precio: 32000 },
+        { ref: "0936", nombre: "AREQUIPE PROLECHE 12DIP*24UND", precio: 28500 },
+        { ref: "10245", nombre: "AREQUIPE PROLECHE 48*150GR", precio: 52000 },
+        { ref: "10689", nombre: "CREMA DE LECHE REPOS 12*1 LT", precio: 85000 },
+        { ref: "11054", nombre: "LECHE PROLE DESLACTOSADA 30*380G", precio: 98000 }
     ];
 
-    const pedidoActual = {};
+    const pedido = {};
 
     function renderizar(filtro = "") {
         const body = document.getElementById('tabla-body');
         body.innerHTML = "";
-
-        const filtrados = productosLactalis.filter(p => 
-            p.nombre.toLowerCase().includes(filtro.toLowerCase()) || 
-            p.ref.includes(filtro)
-        );
+        const filtrados = productosLactalis.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()));
 
         filtrados.forEach(p => {
-            const badgeClass = p.proveedor === 'PARMALAT' ? 'badge-parmalat' : 'badge-proleche';
-            const cantidad = pedidoActual[p.ref] || "";
+            const d = pedido[p.ref] || { cant: 0, desc: 0 };
+            const neto = p.precio * (1 - (d.desc / 100));
             
-            const row = `<tr>
-                <td><strong>${p.nombre}</strong><br><small style="color:#888;">Ref: ${p.ref}</small></td>
-                <td>
-                    <input type="number" class="cant-input" min="0" placeholder="0" 
-                    value="${cantidad}" oninput="actualizarCantidad('${p.ref}', this.value)">
-                </td>
-                <td><span class="badge ${badgeClass}">${p.proveedor}</span></td>
+            body.innerHTML += `<tr>
+                <td>${p.nombre}<br><small>${p.ref}</small></td>
+                <td><input type="number" class="cant-input" value="${d.cant || ''}" oninput="actualizar('${p.ref}', 'cant', this.value)"></td>
+                <td>$${p.precio.toLocaleString()}</td>
+                <td><input type="number" class="desc-input" value="${d.desc || ''}" oninput="actualizar('${p.ref}', 'desc', this.value)"></td>
+                <td class="precio-final">$${Math.round(neto).toLocaleString()}</td>
             </tr>`;
-            body.insertAdjacentHTML('beforeend', row);
         });
     }
 
-    function actualizarCantidad(ref, valor) {
-        if (valor > 0) pedidoActual[ref] = valor;
-        else delete pedidoActual[ref];
+    function actualizar(ref, campo, valor) {
+        if (!pedido[ref]) pedido[ref] = { cant: 0, desc: 0 };
+        pedido[ref][campo] = parseFloat(valor) || 0;
+        calcularTotal();
+        if (campo === 'desc') renderizar(document.getElementById('buscador').value);
+    }
+
+    function calcularTotal() {
+        let total = 0;
+        for (const ref in pedido) {
+            const p = productosLactalis.find(prod => prod.ref === ref);
+            const neto = p.precio * (1 - (pedido[ref].desc / 100));
+            total += pedido[ref].cant * neto;
+        }
+        document.getElementById('total-general').innerText = Math.round(total).toLocaleString();
     }
 
     function enviarPedido() {
-        const cliente = document.getElementById('cliente').value.trim();
-        const lineas = [];
-        for (const ref in pedidoActual) {
-            const prod = productosLactalis.find(p => p.ref === ref);
-            lineas.push(`✅ ${prod.nombre} (Ref: ${ref}) -> *Cant: ${pedidoActual[ref]}*`);
-        }
-        if (lineas.length === 0) return alert("Ingresa cantidades primero.");
+        const cliente = document.getElementById('cliente').value || 'No indicado';
+        let totalG = 0;
+        let lineas = [];
 
-        const mensaje = `*PEDIDO LACTALIS*\n👤 *Cliente:* ${cliente || 'No indicado'}\n\n${lineas.join('\n')}\n\n💼 _Distrileco_`;
-        window.open(`https://wa.me/573117700431?text=${encodeURIComponent(mensaje)}`, '_blank');
+        for (const ref in pedido) {
+            if (pedido[ref].cant > 0) {
+                const p = productosLactalis.find(prod => prod.ref === ref);
+                const neto = p.precio * (1 - (pedido[ref].desc / 100));
+                const subtotal = pedido[ref].cant * neto;
+                totalG += subtotal;
+                lineas.push(`✅ ${p.nombre}\nCant: ${pedido[ref].cant} | Desc: ${pedido[ref].desc}%\nSubtotal: $${Math.round(subtotal).toLocaleString()}`);
+            }
+        }
+
+        if (lineas.length === 0) return alert("Pedido vacío");
+
+        const msg = `*PEDIDO DISTRILECO*\n👤 *Cliente:* ${cliente}\n\n${lineas.join('\n\n')}\n\n💰 *TOTAL PEDIDO: $${Math.round(totalG).toLocaleString()}*`;
+        window.open(`https://wa.me/573117700431?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    window.onload = () => {
-        renderizar();
-        document.getElementById('buscador').addEventListener('input', (e) => renderizar(e.target.value));
-    };
+    window.onload = renderizar;
+    document.getElementById('buscador').oninput = (e) => renderizar(e.target.value);
 </script>
-
 </body>
 </html>
