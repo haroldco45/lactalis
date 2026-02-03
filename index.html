@@ -11,22 +11,35 @@
             --bg-color: #f8f9fa;
         }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 170px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h1 { text-align: center; color: var(--lactalis-green); font-size: 1.4rem; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 15px; }
         
-        /* Estilos Suscripción */
+        /* --- ESTILOS RELOJ Y SUSCRIPCIÓN --- */
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto 10px auto;
+            font-size: 0.75rem;
+            color: #555;
+            font-weight: bold;
+        }
+        .reloj-colombia { background: #333; color: #fff; padding: 5px 12px; border-radius: 15px; }
+        .estado-suscripcion { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 15px; }
+        
         #bloqueo-suscripcion {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             color: white;
             z-index: 9999;
             text-align: center;
             padding-top: 20%;
         }
-        .btn-pago { background: #f1c40f; color: black; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 20px; cursor: pointer; border: none; }
+        
+        .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        h1 { text-align: center; color: var(--lactalis-green); font-size: 1.4rem; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 15px; }
         
         .input-group { margin-bottom: 10px; }
         input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 0.9rem; }
@@ -34,22 +47,25 @@
         th { background-color: var(--lactalis-green); color: white; padding: 8px; text-align: left; position: sticky; top: 0; }
         td { padding: 6px; border-bottom: 1px solid #eee; }
         .edit-input { width: 75px; padding: 6px; border: 1px solid #4CAF50; border-radius: 5px; text-align: center; font-size: 0.85rem; }
-        .unit-input { width: 55px; border-color: #ccc; }
-        .total-bar { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; z-index: 999; }
+        .total-bar { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; z-index: 998; }
         .button-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; display: flex; gap: 10px; z-index: 1000; }
-        .btn { flex: 1; padding: 15px; border-radius: 50px; text-decoration: none; font-weight: bold; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: none; cursor: pointer; color: white; font-size: 0.9rem; }
+        .btn { flex: 1; padding: 15px; border-radius: 50px; font-weight: bold; text-align: center; border: none; cursor: pointer; color: white; font-size: 0.9rem; }
         .btn-whatsapp { background-color: #25d366; }
         .btn-clear { background-color: #e74c3c; }
-        .neto-col { font-weight: bold; color: var(--parmalat-blue); }
+        .btn-pago { background: #f1c40f; color: black; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 20px; border: none; }
     </style>
 </head>
 <body>
 
 <div id="bloqueo-suscripcion">
-    <h2>⚠️ SUSCRIPCIÓN VENCIDA</h2>
-    <p>Tu acceso al Portafolio Lactalis ha caducado.</p>
-    <p>Para reactivar, realiza el pago mensual de <b>$20.000 COP</b>.</p>
-    <button class="btn-pago" onclick="solicitarActivacion()">💰 PAGAR MI SUSCRIPCIÓN</button>
+    <h2>⚠️ ACCESO RESTRINGIDO</h2>
+    <p>Suscripción vencida. Valor renovación: <b>$20.000 COP</b></p>
+    <button class="btn-pago" onclick="solicitarActivacion()">💰 PAGAR PARA ACTIVAR</button>
+</div>
+
+<div class="header-info">
+    <div class="estado-suscripcion" id="info-dias">Cargando...</div>
+    <div class="reloj-colombia" id="reloj">00:00:00</div>
 </div>
 
 <div class="container">
@@ -57,11 +73,10 @@
     <p class="subtitle">Preventa y Distribución - Distrileco</p>
     
     <div class="input-group">
-        <label style="font-size: 0.8rem; font-weight: bold;">Cliente / Negocio:</label>
         <input type="text" id="cliente" placeholder="Nombre del negocio...">
     </div>
     <div class="input-group">
-        <input type="text" id="buscador" placeholder="🔎 Buscar por nombre o referencia...">
+        <input type="text" id="buscador" placeholder="🔎 Buscar producto...">
     </div>
 
     <table>
@@ -82,61 +97,39 @@
 <div class="total-bar">TOTAL NEGOCIO: $<span id="total-general">0</span></div>
 
 <div class="button-container">
-    <button class="btn btn-clear" onclick="nuevoCliente()">🗑️ NUEVO CLIENTE</button>
-    <button class="btn btn-whatsapp" onclick="enviarPedido()">🚀 ENVIAR WHATSAPP</button>
+    <button class="btn btn-clear" onclick="nuevoCliente()">🗑️ NUEVO</button>
+    <button class="btn btn-whatsapp" onclick="enviarPedido()">🚀 WHATSAPP</button>
 </div>
 
 <script>
-    // --- Lógica de Suscripción ---
-    const MES_EN_MS = 30 * 24 * 60 * 60 * 1000; // 30 días en milisegundos
+    // --- RELOJ TIEMPO REAL COLOMBIA ---
+    function actualizarReloj() {
+        const ahora = new Date();
+        const opciones = { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        document.getElementById('reloj').innerText = ahora.toLocaleTimeString('es-CO', opciones);
+    }
+    setInterval(actualizarReloj, 1000);
 
+    // --- SUSCRIPCIÓN ---
+    const MES_EN_MS = 30 * 24 * 60 * 60 * 1000;
     function verificarSuscripcion() {
-        let fechaPago = localStorage.getItem('fechaUltimoPago');
-        
-        // Si es la primera vez, le regalamos 24h para probar
-        if (!fechaPago) {
-            fechaPago = Date.now();
-            localStorage.setItem('fechaUltimoPago', fechaPago);
-        }
-
-        const tiempoTranscurrido = Date.now() - parseInt(fechaPago);
-        
-        if (tiempoTranscurrido > MES_EN_MS) {
-            document.getElementById('bloqueo-suscripcion').style.display = 'block';
-        }
+        let inicio = localStorage.getItem('fechaSuscripcion');
+        if (!inicio) { inicio = Date.now(); localStorage.setItem('fechaSuscripcion', inicio); }
+        const diff = Date.now() - parseInt(inicio);
+        const dias = Math.ceil((MES_EN_MS - diff) / (1000 * 60 * 60 * 24));
+        if (diff > MES_EN_MS) document.getElementById('bloqueo-suscripcion').style.display = 'block';
+        else document.getElementById('info-dias').innerText = `Días restantes: ${dias}`;
     }
 
     function solicitarActivacion() {
-        const msg = encodeURIComponent("Hola Harold, quiero pagar los $20.000 de mi mensualidad de la App Lactalis para activarla.");
-        window.open(`https://wa.me/573117700431?text=${msg}`, '_blank');
+        window.open(`https://wa.me/573117700431?text=Harold%20quiero%20activar%20mi%20suscripcion`, '_blank');
     }
 
-    // --- Datos de Productos ---
+    // --- LÓGICA DE NEGOCIO ---
     const productosBase = [
         { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", unidad: "UND", precio: 0 },
-        { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M 827135", unidad: "UND", precio: 0 },
-        { ref: "0936", nombre: "AREQUIPE PROLECHE 12DIP*24UND*50G", unidad: "DISP", precio: 0 },
-        { ref: "10245", nombre: "AREQUIPE PROLECHE 48*150GR 827236", unidad: "UND", precio: 0 },
-        { ref: "10689", nombre: "CREMA DE LECHE REPOS 12*1 LT 827140", unidad: "UND", precio: 0 },
-        { ref: "10798", nombre: "LECHE CONDESA PARMA 48*100GR DPK 10220", unidad: "UND", precio: 0 },
         { ref: "11054", nombre: "LECHE PROLE DESLACTOSADA 30*380G 7908", unidad: "UND", precio: 98000 },
-        { ref: "11369", nombre: "LECHE PROLE POLVO 30*380GR 827186", unidad: "UND", precio: 0 },
-        { ref: "11370", nombre: "LECHE PROLE POLVO 60*200GR 827174", unidad: "UND", precio: 0 },
-        { ref: "11830", nombre: "LECHE PROLE LIQ 18*900ML 10327", unidad: "UND", precio: 0 },
-        { ref: "13039", nombre: "AREQUIPE PROLECHE 24*6*50GR 827195", unidad: "DISP", precio: 0 },
-        { ref: "13168", nombre: "LECHE PROLE POLVO 12*900GR 827175", unidad: "UND", precio: 0 },
-        { ref: "13340", nombre: "CREMA DE LECHE REP LIQ 15BOL*1.1 LT 7862", unidad: "BOLSA", precio: 0 },
-        { ref: "14732", nombre: "AREQUIPE PROLECHE 36*220GR 827394", unidad: "UND", precio: 0 },
-        { ref: "18631", nombre: "LECHE PROLE LIQ 18*1000ML 827817", unidad: "UND", precio: 0 },
-        { ref: "19550", nombre: "LECHE PROLE LIQ DESLACT 18*1000ML", unidad: "UND", precio: 0 },
-        { ref: "19888", nombre: "LECHE PROLE LIQ CLASICA 30*400ML", unidad: "UND", precio: 0 },
-        { ref: "19919", nombre: "LECHE PROLE POLVO 12*8*75GR 827057", unidad: "RISTRA", precio: 0 },
-        { ref: "19920", nombre: "LECHE PROLE POLVO 18*10*25GR 827087", unidad: "RISTRA", precio: 0 },
-        { ref: "19943", nombre: "LECHE COND PARMA 3*4500GR DPK 827037", unidad: "UND", precio: 0 },
-        { ref: "20018", nombre: "ACEITE MI CALDERITO 12*900ML BONIF", unidad: "UND", precio: 0 },
-        { ref: "4634", nombre: "AREQUIPE PROLECHE 24*500GR 27198", unidad: "UND", precio: 0 },
-        { ref: "4641", nombre: "CREMA DE LECHE REPOSTER 27*200ML", unidad: "UND", precio: 0 },
-        { ref: "9529", nombre: "LECHE PROLE AZUCARADA 60*104GR 827183", unidad: "UND", precio: 0 }
+        { ref: "11369", nombre: "LECHE PROLE POLVO 30*380GR 827186", unidad: "UND", precio: 0 }
     ];
 
     let estadoApp = {};
@@ -144,19 +137,17 @@
     function renderizar(filtro = "") {
         const body = document.getElementById('tabla-body');
         body.innerHTML = "";
-        const filtrados = productosBase.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()) || p.ref.includes(filtro));
-
-        filtrados.forEach(p => {
+        productosBase.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase())).forEach(p => {
             if (!estadoApp[p.ref]) estadoApp[p.ref] = { cant: 0, unidad: p.unidad, precio: p.precio, desc: 0 };
             const it = estadoApp[p.ref];
             const neto = it.precio * (1 - (it.desc / 100));
-            body.innerHTML += `<tr id="fila-${p.ref}">
-                <td><strong>${p.nombre}</strong><br><small>${p.ref}</small></td>
-                <td><input type="text" class="edit-input unit-input" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
+            body.innerHTML += `<tr>
+                <td><strong>${p.nombre}</strong></td>
+                <td><input type="text" class="edit-input" style="width:40px" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.cant || ''}" oninput="cambiar('${p.ref}','cant',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.precio || ''}" oninput="cambiar('${p.ref}','precio',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.desc || ''}" oninput="cambiar('${p.ref}','desc',this.value)"></td>
-                <td class="neto-col" id="neto-${p.ref}">$${Math.round(neto).toLocaleString()}</td>
+                <td id="neto-${p.ref}">$${Math.round(neto).toLocaleString()}</td>
             </tr>`;
         });
     }
@@ -165,8 +156,7 @@
         estadoApp[ref][campo] = campo === 'unidad' ? valor : (parseFloat(valor) || 0);
         const it = estadoApp[ref];
         const neto = it.precio * (1 - (it.desc / 100));
-        const netoElem = document.getElementById(`neto-${ref}`);
-        if(netoElem) netoElem.innerText = `$${Math.round(neto).toLocaleString()}`;
+        document.getElementById(`neto-${ref}`).innerText = `$${Math.round(neto).toLocaleString()}`;
         calcularTotal();
     }
 
@@ -180,38 +170,25 @@
     }
 
     function nuevoCliente() {
-        if(confirm("¿Deseas borrar todo para un nuevo cliente?")) {
-            estadoApp = {};
-            document.getElementById('cliente').value = "";
-            document.getElementById('buscador').value = "";
-            renderizar();
-            calcularTotal();
-        }
+        if(confirm("¿Limpiar para nuevo cliente?")) { estadoApp = {}; document.getElementById('cliente').value = ""; renderizar(); calcularTotal(); }
     }
 
     function enviarPedido() {
         const cliente = document.getElementById('cliente').value || 'No indicado';
+        const fechaMsg = new Date().toLocaleString('es-CO', { timeZone: 'America/Bogota' });
         let det = [];
-        let suma = 0;
         for (const r in estadoApp) {
             const it = estadoApp[r];
             if (it.cant > 0) {
                 const p = productosBase.find(x => x.ref === r);
-                const n = it.precio * (1 - (it.desc / 100));
-                const sub = it.cant * n;
-                suma += sub;
-                det.push(`✅ *${p.nombre}*\nCant: ${it.cant} ${it.unidad} | Neto: $${Math.round(n).toLocaleString()}\n*Subtotal: $${Math.round(sub).toLocaleString()}*`);
+                det.push(`✅ *${p.nombre}*\nCant: ${it.cant} ${it.unidad} | Subtotal: $${Math.round(it.cant * (it.precio * (1 - (it.desc / 100)))).toLocaleString()}`);
             }
         }
-        if (det.length === 0) return alert("Pedido vacío");
-        const msg = `*RESUMEN DE NEGOCIO - DISTRILECO*\n👤 *Cliente:* ${cliente}\n\n${det.join('\n\n')}\n\n💰 *TOTAL: $${Math.round(suma).toLocaleString()}*`;
+        const msg = `*NEGOCIO DISTRILECO*\n👤 *Cliente:* ${cliente}\n📅 *Fecha/Hora:* ${fechaMsg}\n\n${det.join('\n\n')}`;
         window.open(`https://wa.me/573117700431?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    window.onload = () => {
-        verificarSuscripcion(); // Al cargar, revisa si ya pasó el mes
-        renderizar();
-    };
+    window.onload = () => { actualizarReloj(); verificarSuscripcion(); renderizar(); };
     document.getElementById('buscador').oninput = (e) => renderizar(e.target.value);
 </script>
 </body>
