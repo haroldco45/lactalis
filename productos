@@ -1,4 +1,3 @@
-// productos.js
 const productosLactalis = [
     { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", unidad: "UND", proveedor: "PARMALAT" },
     { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M 827135", unidad: "UND", proveedor: "PARMALAT" },
