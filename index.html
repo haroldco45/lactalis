@@ -12,26 +12,15 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 160px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        h1 { text-align: center; color: var(--lactalis-green); margin-bottom: 5px; font-size: 1.4rem; }
+        h1 { text-align: center; color: var(--lactalis-green); font-size: 1.4rem; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #666; font-size: 0.8rem; margin-bottom: 15px; }
         .input-group { margin-bottom: 10px; }
         input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 0.9rem; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
         th { background-color: var(--lactalis-green); color: white; padding: 8px; text-align: left; position: sticky; top: 0; }
         td { padding: 6px; border-bottom: 1px solid #eee; }
-        
-        /* Estilos para que los campos editables resalten */
-        .edit-input { 
-            width: 80px; 
-            padding: 6px; 
-            border: 1px solid #4CAF50; 
-            border-radius: 5px; 
-            text-align: center; 
-            font-size: 0.85rem;
-            background-color: #fff;
-        }
-        .unit-input { width: 60px; border-color: #ccc; }
-        
+        .edit-input { width: 75px; padding: 6px; border: 1px solid #4CAF50; border-radius: 5px; text-align: center; font-size: 0.85rem; }
+        .unit-input { width: 55px; border-color: #ccc; }
         .total-bar { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px; border-radius: 10px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; z-index: 999; }
         .btn-whatsapp { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #25d366; color: white; padding: 15px; border-radius: 50px; text-decoration: none; font-weight: bold; width: 90%; max-width: 350px; text-align: center; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .neto-col { font-weight: bold; color: var(--parmalat-blue); }
@@ -73,7 +62,6 @@
 </a>
 
 <script>
-    // Base de datos integrada para evitar errores de carga externa
     const productosBase = [
         { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", unidad: "UND", precio: 0 },
         { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M 827135", unidad: "UND", precio: 0 },
@@ -85,21 +73,17 @@
         { ref: "11369", nombre: "LECHE PROLE POLVO 30*380GR 827186", unidad: "UND", precio: 0 },
         { ref: "11370", nombre: "LECHE PROLE POLVO 60*200GR 827174", unidad: "UND", precio: 0 },
         { ref: "11830", nombre: "LECHE PROLE LIQ 18*900ML 10327", unidad: "UND", precio: 0 },
-        { ref: "12011", nombre: "LECHE PROLE POLVO 60*200 BONIF", unidad: "UND", precio: 0 },
         { ref: "13039", nombre: "AREQUIPE PROLECHE 24*6*50GR 827195", unidad: "DISP", precio: 0 },
         { ref: "13168", nombre: "LECHE PROLE POLVO 12*900GR 827175", unidad: "UND", precio: 0 },
         { ref: "13340", nombre: "CREMA DE LECHE REP LIQ 15BOL*1.1 LT 7862", unidad: "BOLSA", precio: 0 },
         { ref: "14732", nombre: "AREQUIPE PROLECHE 36*220GR 827394", unidad: "UND", precio: 0 },
         { ref: "18631", nombre: "LECHE PROLE LIQ 18*1000ML 827817", unidad: "UND", precio: 0 },
-        { ref: "19484", nombre: "SANDUCHERA DE WAFLER OSTER 750W", unidad: "UND", precio: 0 },
         { ref: "19550", nombre: "LECHE PROLE LIQ DESLACT 18*1000ML", unidad: "UND", precio: 0 },
         { ref: "19888", nombre: "LECHE PROLE LIQ CLASICA 30*400ML", unidad: "UND", precio: 0 },
         { ref: "19919", nombre: "LECHE PROLE POLVO 12*8*75GR 827057", unidad: "RISTRA", precio: 0 },
         { ref: "19920", nombre: "LECHE PROLE POLVO 18*10*25GR 827087", unidad: "RISTRA", precio: 0 },
         { ref: "19943", nombre: "LECHE COND PARMA 3*4500GR DPK 827037", unidad: "UND", precio: 0 },
-        { ref: "19966", nombre: "LECHE PROLE LIQ CLASICA 30*400ML BONIF", unidad: "UND", precio: 0 },
         { ref: "20018", nombre: "ACEITE MI CALDERITO 12*900ML BONIF", unidad: "UND", precio: 0 },
-        { ref: "20067", nombre: "LECHE PROLE POLVO 18*10*25GR BONIF", unidad: "RISTRA", precio: 0 },
         { ref: "4634", nombre: "AREQUIPE PROLECHE 24*500GR 27198", unidad: "UND", precio: 0 },
         { ref: "4641", nombre: "CREMA DE LECHE REPOSTER 27*200ML", unidad: "UND", precio: 0 },
         { ref: "9529", nombre: "LECHE PROLE AZUCARADA 60*104GR 827183", unidad: "UND", precio: 0 }
@@ -110,91 +94,65 @@
     function renderizar(filtro = "") {
         const body = document.getElementById('tabla-body');
         body.innerHTML = "";
-        
-        const filtrados = productosBase.filter(p => 
-            p.nombre.toLowerCase().includes(filtro.toLowerCase()) || 
-            p.ref.includes(filtro)
-        );
+        const filtrados = productosBase.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()) || p.ref.includes(filtro));
 
         filtrados.forEach(p => {
-            if (!estadoApp[p.ref]) {
-                estadoApp[p.ref] = { cant: 0, unidad: p.unidad, precio: p.precio, desc: 0 };
-            }
-            
-            const item = estadoApp[p.ref];
-            const netoUnitario = item.precio * (1 - (item.desc / 100));
-            
-            body.innerHTML += `<tr>
+            if (!estadoApp[p.ref]) estadoApp[p.ref] = { cant: 0, unidad: p.unidad, precio: p.precio, desc: 0 };
+            const it = estadoApp[p.ref];
+            const neto = it.precio * (1 - (it.desc / 100));
+            body.innerHTML += `<tr id="fila-${p.ref}">
                 <td><strong>${p.nombre}</strong><br><small>${p.ref}</small></td>
-                <td><input type="text" class="edit-input unit-input" value="${item.unidad}" oninput="cambiar('${p.ref}', 'unidad', this.value)"></td>
-                <td><input type="number" class="edit-input" placeholder="0" value="${item.cant || ''}" oninput="cambiar('${p.ref}', 'cant', this.value)"></td>
-                <td><input type="number" class="edit-input" placeholder="$" value="${item.precio || ''}" oninput="cambiar('${p.ref}', 'precio', this.value)"></td>
-                <td><input type="number" class="edit-input" placeholder="%" value="${item.desc || ''}" oninput="cambiar('${p.ref}', 'desc', this.value)"></td>
-                <td class="neto-col">$${Math.round(netoUnitario).toLocaleString()}</td>
+                <td><input type="text" class="edit-input unit-input" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
+                <td><input type="number" class="edit-input" value="${it.cant || ''}" oninput="cambiar('${p.ref}','cant',this.value)"></td>
+                <td><input type="number" class="edit-input" value="${it.precio || ''}" oninput="cambiar('${p.ref}','precio',this.value)"></td>
+                <td><input type="number" class="edit-input" value="${it.desc || ''}" oninput="cambiar('${p.ref}','desc',this.value)"></td>
+                <td class="neto-col" id="neto-${p.ref}">$${Math.round(neto).toLocaleString()}</td>
             </tr>`;
         });
     }
 
     function cambiar(ref, campo, valor) {
-        if (campo === 'unidad') {
-            estadoApp[ref][campo] = valor;
-        } else {
-            estadoApp[ref][campo] = parseFloat(valor) || 0;
-        }
-        calcularTotalGeneral();
+        // Guardamos el dato sin re-dibujar toda la tabla
+        estadoApp[ref][campo] = campo === 'unidad' ? valor : (parseFloat(valor) || 0);
         
-        // Actualizamos el Neto visual en la tabla si se toca precio o descuento
-        if (campo === 'precio' || campo === 'desc') {
-            renderizar(document.getElementById('buscador').value);
-        }
+        // Actualizamos solo el neto de esta fila y el total general
+        const it = estadoApp[ref];
+        const neto = it.precio * (1 - (it.desc / 100));
+        document.getElementById(`neto-${ref}`).innerText = `$${Math.round(neto).toLocaleString()}`;
+        
+        calcularTotal();
     }
 
-    function calcularTotalGeneral() {
-        let total = 0;
-        for (const ref in estadoApp) {
-            const item = estadoApp[ref];
-            const netoUnitario = item.precio * (1 - (item.desc / 100));
-            total += item.cant * netoUnitario;
+    function calcularTotal() {
+        let t = 0;
+        for (const r in estadoApp) {
+            const it = estadoApp[r];
+            t += it.cant * (it.precio * (1 - (it.desc / 100)));
         }
-        document.getElementById('total-general').innerText = Math.round(total).toLocaleString();
+        document.getElementById('total-general').innerText = Math.round(t).toLocaleString();
     }
 
     function enviarPedido() {
-        const cliente = document.getElementById('cliente').value.trim() || 'No especificado';
-        let detalle = [];
-        let sumaTotal = 0;
-
-        for (const ref in estadoApp) {
-            const item = estadoApp[ref];
-            if (item.cant > 0) {
-                const prod = productosBase.find(p => p.ref === ref);
-                const netoUnitario = item.precio * (1 - (item.desc / 100));
-                const subtotal = item.cant * netoUnitario;
-                sumaTotal += subtotal;
-
-                detalle.push(
-                    `🔶 *${prod.nombre}*\n` +
-                    `   Cant: ${item.cant} ${item.unit} | Neto: $${Math.round(netoUnitario).toLocaleString()}\n` +
-                    `   *Subtotal: $${Math.round(subtotal).toLocaleString()}*`
-                );
+        const cliente = document.getElementById('cliente').value || 'No indicado';
+        let det = [];
+        let suma = 0;
+        for (const r in estadoApp) {
+            const it = estadoApp[r];
+            if (it.cant > 0) {
+                const p = productosBase.find(x => x.ref === r);
+                const n = it.precio * (1 - (it.desc / 100));
+                const sub = it.cant * n;
+                suma += sub;
+                det.push(`✅ *${p.nombre}*\nCant: ${it.cant} ${it.unidad} | Neto: $${Math.round(n).toLocaleString()}\n*Subtotal: $${Math.round(sub).toLocaleString()}*`);
             }
         }
-
-        if (detalle.length === 0) return alert("Pedido vacío");
-
-        const mensaje = 
-            `*RESUMEN DE NEGOCIO - DISTRILECO*\n` +
-            `👤 *Cliente:* ${cliente}\n\n` +
-            `${detalle.join('\n\n')}\n\n` +
-            `💰 *TOTAL: $${Math.round(sumaTotal).toLocaleString()}*\n\n` +
-            `📍 _App Lactalis_`;
-
-        window.open(`https://wa.me/573117700431?text=${encodeURIComponent(mensaje)}`, '_blank');
+        if (det.length === 0) return alert("Pedido vacío");
+        const msg = `*RESUMEN DE NEGOCIO - DISTRILECO*\n👤 *Cliente:* ${cliente}\n\n${det.join('\n\n')}\n\n💰 *TOTAL: $${Math.round(suma).toLocaleString()}*`;
+        window.open(`https://wa.me/573117700431?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     window.onload = renderizar;
     document.getElementById('buscador').oninput = (e) => renderizar(e.target.value);
 </script>
-
 </body>
 </html>
