@@ -12,7 +12,6 @@
         }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 170px; }
         
-        /* --- ESTILOS RELOJ Y SUSCRIPCIÓN --- */
         .header-info {
             display: flex;
             justify-content: space-between;
@@ -125,11 +124,36 @@
         window.open(`https://wa.me/573117700431?text=Harold%20quiero%20activar%20mi%20suscripcion`, '_blank');
     }
 
-    // --- LÓGICA DE NEGOCIO ---
+    // --- BASE DE DATOS COMPLETA REESTABLECIDA ---
     const productosBase = [
         { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", unidad: "UND", precio: 0 },
+        { ref: "0883", nombre: "LECHE CONDENSADA PARMA 28*100M 827135", unidad: "UND", precio: 0 },
+        { ref: "0936", nombre: "AREQUIPE PROLECHE 12DIP*24UND*50G 827196", unidad: "DISP", precio: 0 },
+        { ref: "10245", nombre: "AREQUIPE PROLECHE 48*150GR 827236", unidad: "UND", precio: 0 },
+        { ref: "10689", nombre: "CREMA DE LECHE REPOS 12*1 LT 827140", unidad: "UND", precio: 0 },
+        { ref: "10798", nombre: "LECHE CONDESA PARMA 48*100GR DPK 10220", unidad: "UND", precio: 0 },
         { ref: "11054", nombre: "LECHE PROLE DESLACTOSADA 30*380G 7908", unidad: "UND", precio: 98000 },
-        { ref: "11369", nombre: "LECHE PROLE POLVO 30*380GR 827186", unidad: "UND", precio: 0 }
+        { ref: "11369", nombre: "LECHE PROLE POLVO 30*380GR 827186", unidad: "UND", precio: 0 },
+        { ref: "11370", nombre: "LECHE PROLE POLVO 60*200GR 827174", unidad: "UND", precio: 0 },
+        { ref: "11830", nombre: "LECHE PROLE LIQ 18*900ML 10327", unidad: "UND", precio: 0 },
+        { ref: "12011", nombre: "LECHE PROLE POLVO 60*200 BONIF", unidad: "UND", precio: 0 },
+        { ref: "13039", nombre: "AREQUIPE PROLECHE 24*6*50GR 827195", unidad: "DISP", precio: 0 },
+        { ref: "13168", nombre: "LECHE PROLE POLVO 12*900GR 827175", unidad: "UND", precio: 0 },
+        { ref: "13340", nombre: "CREMA DE LECHE REP LIQ 15BOL*1.1 LT 7862", unidad: "BOLSA", precio: 0 },
+        { ref: "14732", nombre: "AREQUIPE PROLECHE 36*220GR 827394", unidad: "UND", precio: 0 },
+        { ref: "18631", nombre: "LECHE PROLE LIQ 18*1000ML 827817-827967", unidad: "UND", precio: 0 },
+        { ref: "19484", nombre: "SANDUCHERA DE WAFLER OSTER 750W", unidad: "UND", precio: 0 },
+        { ref: "19550", nombre: "LECHE PROLE LIQ DESLACT 18*1000ML 827915", unidad: "UND", precio: 0 },
+        { ref: "19888", nombre: "LECHE PROLE LIQ CLASICA 30*400ML 010328", unidad: "UND", precio: 0 },
+        { ref: "19919", nombre: "LECHE PROLE POLVO 12*8*75GR 827057", unidad: "RISTRA", precio: 0 },
+        { ref: "19920", nombre: "LECHE PROLE POLVO 18*10*25GR 827087", unidad: "RISTRA", precio: 0 },
+        { ref: "19943", nombre: "LECHE COND PARMA 3*4500GR DPK 827037", unidad: "UND", precio: 0 },
+        { ref: "19966", nombre: "LECHE PROLE LIQ CLASICA 30*400ML BONIF", unidad: "UND", precio: 0 },
+        { ref: "20018", nombre: "ACEITE MI CALDERITO 12*900ML BONIF", unidad: "UND", precio: 0 },
+        { ref: "20067", nombre: "LECHE PROLE POLVO 18*10*25GR BONIF", unidad: "RISTRA", precio: 0 },
+        { ref: "4634", nombre: "AREQUIPE PROLECHE 24*500GR 27198", unidad: "UND", precio: 0 },
+        { ref: "4641", nombre: "CREMA DE LECHE REPOSTER 27*200ML 827141", unidad: "UND", precio: 0 },
+        { ref: "9529", nombre: "LECHE PROLE AZUCARADA 60*104GR 827183", unidad: "UND", precio: 0 }
     ];
 
     let estadoApp = {};
@@ -137,13 +161,13 @@
     function renderizar(filtro = "") {
         const body = document.getElementById('tabla-body');
         body.innerHTML = "";
-        productosBase.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase())).forEach(p => {
+        productosBase.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()) || p.ref.includes(filtro)).forEach(p => {
             if (!estadoApp[p.ref]) estadoApp[p.ref] = { cant: 0, unidad: p.unidad, precio: p.precio, desc: 0 };
             const it = estadoApp[p.ref];
             const neto = it.precio * (1 - (it.desc / 100));
             body.innerHTML += `<tr>
-                <td><strong>${p.nombre}</strong></td>
-                <td><input type="text" class="edit-input" style="width:40px" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
+                <td><strong>${p.nombre}</strong><br><small>${p.ref}</small></td>
+                <td><input type="text" class="edit-input" style="width:50px" value="${it.unidad}" oninput="cambiar('${p.ref}','unidad',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.cant || ''}" oninput="cambiar('${p.ref}','cant',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.precio || ''}" oninput="cambiar('${p.ref}','precio',this.value)"></td>
                 <td><input type="number" class="edit-input" value="${it.desc || ''}" oninput="cambiar('${p.ref}','desc',this.value)"></td>
