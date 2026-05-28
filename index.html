@@ -10,7 +10,7 @@
             --parmalat-blue: #0056b3;
             --bg-color: #f8f9fa;
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 220px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; padding: 10px; padding-bottom: 240px; }
         .header-info { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 10px auto; font-size: 0.75rem; color: #555; font-weight: bold; }
         .reloj-colombia { background: #333; color: #fff; padding: 5px 12px; border-radius: 15px; cursor: pointer; }
         .estado-suscripcion { background: #fff; border: 1px solid #ddd; padding: 5px 12px; border-radius: 15px; }
@@ -31,13 +31,14 @@
         .btn-clear { background-color: #e74c3c; }
         .btn-excel { background-color: #1D6F42; }
         .btn-pago { background: #f1c40f; color: black; padding: 15px 30px; border-radius: 50px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 20px; border: none; }
+        .credits { text-align: center; font-size: 0.7rem; color: #aaa; margin-top: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="bloqueo-suscripcion">
     <h2>⚠️ ACCESO RESTRINGIDO</h2>
-    <p>Suscripción vencida. Valor renovación: <b>$20.000 COP</b></p>
+    <p>Suscripción vencida. Valor renovación anual: <b>$240.000 COP</b></p>
     <button class="btn-pago" onclick="solicitarActivacion()">💰 PAGAR PARA ACTIVAR</button>
 </div>
 
@@ -55,6 +56,10 @@
         <thead><tr><th>Producto</th><th>Und.</th><th>Cant.</th><th>Precio</th><th>% Desc</th><th>Neto</th></tr></thead>
         <tbody id="tabla-body"></tbody>
     </table>
+    
+    <div class="credits">
+        © 2026 Pedidos Lactalis. Todos los derechos reservados a nombre de Vibras Positivas.
+    </div>
 </div>
 
 <div class="total-bar">TOTAL NEGOCIO: $<span id="total-general">0</span></div>
@@ -74,7 +79,7 @@
         const input = prompt("Ingrese Clave Maestra Dinámica:");
         if (parseInt(input) === claveCorrecta) {
             localStorage.setItem('fechaSuscripcion', Date.now());
-            alert("✅ Renovado por 30 días.");
+            alert("✅ Renovado por 1 año (365 días).");
             location.reload();
         } else if (input !== null) alert("❌ Clave incorrecta.");
     }
@@ -85,17 +90,18 @@
     }
     setInterval(actualizarReloj, 1000);
 
-    const MES_EN_MS = 30 * 24 * 60 * 60 * 1000;
+    // Ajustado a 365 días para la suscripción anual
+    const ANIO_EN_MS = 365 * 24 * 60 * 60 * 1000; 
     function verificarSuscripcion() {
         let inicio = localStorage.getItem('fechaSuscripcion');
         if (!inicio) { inicio = Date.now(); localStorage.setItem('fechaSuscripcion', inicio); }
         const diff = Date.now() - parseInt(inicio);
-        const dias = Math.ceil((MES_EN_MS - diff) / (1000 * 60 * 60 * 24));
-        if (diff > MES_EN_MS) document.getElementById('bloqueo-suscripcion').style.display = 'block';
+        const dias = Math.ceil((ANIO_EN_MS - diff) / (1000 * 60 * 60 * 24));
+        if (diff > ANIO_EN_MS) document.getElementById('bloqueo-suscripcion').style.display = 'block';
         else document.getElementById('info-dias').innerText = `Días restantes: ${dias}`;
     }
 
-    function solicitarActivacion() { window.open(`https://wa.me/573117700431?text=Harold%20quiero%20activar%20mi%20suscripcion`, '_blank'); }
+    function solicitarActivacion() { window.open(`https://wa.me/573117700431?text=Harold%20quiero%20activar%20mi%20suscripcion%20anual`, '_blank'); }
 
     const productosBase = [
         { ref: "0882", nombre: "LECHE CONDENSADA PARMA 15*400G 7134", unidad: "UND", precio: 0 },
@@ -197,7 +203,7 @@
             }
         }
         if (det.length === 0) return alert("Pedido vacío");
-        const msg = `*NEGOCIO DISTRILECO*\n👤 *Cliente:* ${c}\n📅 *Fecha:* ${new Date().toLocaleString('es-CO')}\n\n${det.join('\n\n')}\n\n💰 *TOTAL: $${Math.round(total).toLocaleString()}*`;
+        const msg = `*HNOS MARÍN - VIBRAS POSITIVAS HM*\n👤 *Cliente:* ${c}\n📅 *Fecha:* ${new Date().toLocaleString('es-CO')}\n\n${det.join('\n\n')}\n\n💰 *TOTAL: $${Math.round(total).toLocaleString()}*`;
         window.open(`https://wa.me/573117700431?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
